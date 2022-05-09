@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+.vscode
 coverage.txt
 dist/
 
@@ -7,3 +8,4 @@ dist/
 **/.mvn/wrapper/MavenWrapperDownloader.java
 **/src/main/**/target/
 **/src/test/**/target/
+

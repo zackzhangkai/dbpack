@@ -1,0 +1,11 @@
+version: "2.3"
+services:
+  dbpack-build:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    volumes:
+      - type: bind
+        source: ${PWD}/docker/conf/config_rws.yaml
+        target: /config.yaml
+#      - ${PWD}/docker/conf/config_rws.yaml:/config.yaml:rw

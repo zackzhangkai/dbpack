@@ -6,12 +6,13 @@ services:
     networks:
       - local
     ports:
-    - "3306:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "123456"
     volumes:
-    - ./scripts/drug_0.sql:/docker-entrypoint-initdb.d/drug_0.sql:rw
+      - ./scripts/drug_0.sql:/docker-entrypoint-initdb.d/drug_0.sql:rw
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
   mysql2:
     image: mysql:8.0
     container_name: dbpack-mysql2
@@ -24,19 +25,35 @@ services:
     volumes:
       - ./scripts/drug_1.sql:/docker-entrypoint-initdb.d/drug_1.sql:rw
     command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+
+  # minimal container that builds the dbpack service binary and exits.
+  dbpack-build:
+    image: golang:1.14-alpine
+    working_dir: /go/src/github.com/CECTC/dbpack
+    command: go build -o /usr/local/bin/dbpack ./cmd/dbpack.go
+    volumes:
+      - .:/go/src/github.com/CECTC/dbpack
+      - binary:/usr/local/bin/
+
   dbpack:
-    image: dbpack:latest
+    image: alpine:3.6
     container_name: dbpack
-    command: sh -c "sleep 60 && ./dbpack start -c config.yaml"
+    command: >
+      sh -c "until test -f /usr/local/bin/dbpack; do sleep 5; done; sleep 60; /usr/local/bin/dbpack -c /config.yaml"
     networks:
       - local
     ports:
-    - "13306:13306"
+      - "13306:13306"
     volumes:
-    - ./conf/config_shd.yaml:/app/config.yaml
+      - ./conf/config_shd.yaml:/config.yaml
     depends_on:
       - mysql1
       - mysql2
+      - dbpack-build
+
 networks:
   local:
     name: dbpack
+
+volumes:
+  binary:
