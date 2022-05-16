@@ -66,19 +66,21 @@ unit-test: ## run unit test
 ########################################################
 build-local:  ## build dbpack cli, and put in dist dir
 	@mkdir -p dist
-	${GO_BUILD_ENVVARS} go build -o ./dist/dbpack ./cmd
+	${GO_BUILD_ENVVARS} go build -o dbpack ./cmd
+
+########################################################
+docker-build: ## build docker image
+	docker build -f docker/Dockerfile-rws -t dbpack:latest .
 
 ########################################################
 build:  ## build dbpack cli, and put in dist dir
 	@mkdir -p dist
-	GOOS="linux"  GOARCH="amd64" CGO_ENABLED=0 go build -o ./dist/dbpack ./cmd
+	go mod download
+	go mod tidy
+	GOOS="linux"  GOARCH="amd64" CGO_ENABLED=0 go build -o dbpack ./cmd
 
 ########################################################
-docker-build: build ## build docker image
-	docker build -f docker/Dockerfile -t dbpack:latest .
-
-########################################################
-integration-test: build docker-build
+integration-test:
 	sh test/cmd/test_single_db.sh
 	sh test/cmd/test_read_write_splitting.sh
 	sh test/cmd/test_sharding.sh

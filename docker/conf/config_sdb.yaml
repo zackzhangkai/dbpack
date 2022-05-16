@@ -33,7 +33,6 @@ filters:
       appid: svc
       lock_retry_interval: 50ms
       lock_retry_times: 30
-  - name: ConnectionMetricFilter
 
 distributed_transaction:
   appid: svc
@@ -43,4 +42,4 @@ distributed_transaction:
     endpoints:
       - etcd:2379
 
-exporter_port: 9999
+exporter_port: 9999 
